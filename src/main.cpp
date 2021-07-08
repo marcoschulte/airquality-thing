@@ -4,8 +4,12 @@
 #include <DNSServer.h>
 #include <WiFiManager.h>
 #include "PM_PMS5003.h"
+#include "CO2_S8.h"
 
 PM_PMS5003 pm = PM_PMS5003(D5, D6);
+CO2_S8 co2 = CO2_S8(D4, D3);
+
+void readPM();
 
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
@@ -13,13 +17,25 @@ void setup() {
     Serial.println("Hello");
 
     pm.init();
+    co2.init();
+}
+
+void readCO2() {
+    int co2Result = co2.read();
+    Serial.print("CO2: ");
+    Serial.println(co2Result);
+    delay(1000);
 }
 
 void loop() {
+    readCO2();
+}
+
+void readPM() {
     struct PM_PMS5003::data data;
 
     // data after wake-up only available after second read and "enough" time to wake up.
-    // otherwise particle count is 0 and pm ~ 2
+// otherwise particle count is 0 and pm ~ 2
     for (int i = 0; i < 2; i++) {
         if (pm.read(&data)) {
             Serial.println("concentration units");
