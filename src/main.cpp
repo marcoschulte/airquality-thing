@@ -10,6 +10,11 @@
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
 #include "bsec.h"
+#include <FastLED.h>
+
+#define LED_PIN     D7
+#define NUM_LEDS    1
+CRGB leds[NUM_LEDS];
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -62,6 +67,9 @@ void setup() {
     Wire.begin();
     Serial.println("Hello");
 
+    FastLED.addLeds<NEOPIXEL, LED_PIN>(leds, NUM_LEDS);
+
+
     iaqSensor.begin(BME680_I2C_ADDR_SECONDARY, Wire);
     output = "\nBSEC library version " + String(iaqSensor.version.major) + "." + String(iaqSensor.version.minor) + "." +
              String(iaqSensor.version.major_bugfix) + "." + String(iaqSensor.version.minor_bugfix);
@@ -80,10 +88,6 @@ void setup() {
     iaqSensor.updateSubscription(sensorList, 10, BSEC_SAMPLE_RATE_LP);
     checkIaqSensorStatus();
 
-    // Print the header
-    output = "Timestamp [ms], pressure [hPa], IAQ, temperature [°C], relative humidity [%], CO2 equivalent, breath VOC equivalent";
-    Serial.println(output);
-
     pm.init();
     co2.init();
 }
@@ -91,13 +95,16 @@ void setup() {
 void readBME() {
     unsigned long time_trigger = millis();
     if (iaqSensor.run()) { // If new data is available
+        output = "Timestamp [ms], pressure [hPa], IAQ, temperature [°C], relative humidity [%], CO2 equivalent, breath VOC equivalent";
+        Serial.println(output);
+
         output = String(time_trigger);
-        output += ", " + String(iaqSensor.pressure / 100);
+        output += ", " + String(iaqSensor.pressure / 100) + "hPa";
         output += ", " + String(iaqSensor.staticIaq);
-        output += ", " + String(iaqSensor.temperature);
-        output += ", " + String(iaqSensor.humidity);
-        output += ", " + String(iaqSensor.co2Equivalent);
-        output += ", " + String(iaqSensor.breathVocEquivalent);
+        output += ", " + String(iaqSensor.temperature) + "°C";
+        output += ", " + String(iaqSensor.humidity) + "%";
+        output += ", " + String(iaqSensor.co2Equivalent) + "ppm";
+        output += ", " + String(iaqSensor.breathVocEquivalent) + "ppm";
         Serial.println(output);
     } else {
         checkIaqSensorStatus();
@@ -107,8 +114,8 @@ void readBME() {
 void readCO2() {
     int co2Result = co2.read();
     Serial.print("CO2: ");
-    Serial.println(co2Result);
-    delay(1000);
+    Serial.print(co2Result);
+    Serial.println("ppm");
 }
 
 void readPM() {
@@ -154,6 +161,7 @@ void readPM() {
         }
     }
 
+    /*
     Serial.println("sleep");
     pm.sleep();
     delay(3000);
@@ -162,9 +170,22 @@ void readPM() {
     Serial.println();
     pm.wake();
     delay(30000);
+     */
 }
 
 void loop() {
+    leds[0] = CRGB::Red;
+    FastLED.show();
     readBME();
-    delay(2000);
+    delay(1000);
+
+    leds[0] = CRGB::Green;
+    FastLED.show();
+    readCO2();
+    delay(1000);
+
+    leds[0] = CRGB::Blue;
+    FastLED.show();
+    readPM();
+    delay(1000);
 }
