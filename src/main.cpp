@@ -11,6 +11,10 @@
 #include <FastLED.h>
 #include "SSD1306Wire.h"
 
+const uint8_t bsec_config_iaq[] = {
+#include "config/generic_33v_3s_4d/bsec_iaq.txt"
+};
+
 #define LED_PIN     D7
 #define NUM_LEDS    1
 CRGB leds[NUM_LEDS];
@@ -92,15 +96,21 @@ void setup() {
              "." +
              String(iaqSensor.version.major_bugfix) + "." + String(iaqSensor.version.minor_bugfix);
     Serial.println(output);
-    checkIaqSensorStatus();
 
-    bsec_virtual_sensor_t sensorList[10] = {
+    checkIaqSensorStatus();
+    iaqSensor.setConfig(bsec_config_iaq);
+
+    bsec_virtual_sensor_t sensorList[] = {
+            BSEC_OUTPUT_RAW_TEMPERATURE,
             BSEC_OUTPUT_RAW_PRESSURE,
+            BSEC_OUTPUT_RAW_HUMIDITY,
+            BSEC_OUTPUT_RAW_GAS,
+            BSEC_OUTPUT_IAQ,
             BSEC_OUTPUT_STATIC_IAQ,
-            BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_TEMPERATURE,
-            BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY,
             BSEC_OUTPUT_CO2_EQUIVALENT,
             BSEC_OUTPUT_BREATH_VOC_EQUIVALENT,
+            BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_TEMPERATURE,
+            BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY,
     };
 
     iaqSensor.updateSubscription(sensorList, 10, BSEC_SAMPLE_RATE_LP);
@@ -221,20 +231,24 @@ void readPM() {
      */
 }
 
+long millis2 = millis();
+
 void loop() {
     leds[0] = CRGB::Red;
     FastLED.show();
     readBME();
+    Serial.println("Millis: " + String(millis() - millis2));
+    millis2 = millis();
 //    delay(1000);
 
     leds[0] = CRGB::Green;
     FastLED.show();
     readCO2();
-    delay(4000);
+    delay(1500);
 
     leds[0] = CRGB::Blue;
     FastLED.show();
     readPM();
-    delay(4000);
+    delay(1200);
 }
 
