@@ -7,10 +7,9 @@
 #include <WiFiManager.h>
 #include "PM_PMS5003.h"
 #include "CO2_S8.h"
-#include <Adafruit_Sensor.h>
-#include "Adafruit_BME680.h"
 #include "bsec.h"
 #include <FastLED.h>
+#include "SSD1306Wire.h"
 
 #define LED_PIN     D7
 #define NUM_LEDS    1
@@ -20,8 +19,9 @@ CRGB leds[NUM_LEDS];
 
 PM_PMS5003 pm = PM_PMS5003(D5, D6);
 CO2_S8 co2 = CO2_S8(D4, D3);
-//Adafruit_BME680 bme;
 Bsec iaqSensor;
+SSD1306Wire display(0x3c, SDA, SCL);
+
 String output;
 
 void readPM();
@@ -32,6 +32,21 @@ void errLeds(void) {
     delay(100);
     digitalWrite(LED_BUILTIN, LOW);
     delay(100);
+}
+
+void displayTextDemo() {
+    while (true) {
+        for (int x = 0; x < 64; x++) {
+            for (int y = 0; y < 48; y++) {
+                display.clear();
+                display.setTextAlignment(TEXT_ALIGN_LEFT);
+                display.setFont(ArialMT_Plain_10);
+                display.drawString(x + 32, y, String(x + 32) + "," + String(y));
+                display.display();
+                delay(15);
+            }
+        }
+    }
 }
 
 // Helper function definitions
@@ -68,10 +83,13 @@ void setup() {
     Serial.println("Hello");
 
     FastLED.addLeds<NEOPIXEL, LED_PIN>(leds, NUM_LEDS);
+    FastLED.setBrightness(50);
 
+    display.init();
 
     iaqSensor.begin(BME680_I2C_ADDR_SECONDARY, Wire);
-    output = "\nBSEC library version " + String(iaqSensor.version.major) + "." + String(iaqSensor.version.minor) + "." +
+    output = "\nBSEC library version " + String(iaqSensor.version.major) + "." + String(iaqSensor.version.minor) +
+             "." +
              String(iaqSensor.version.major_bugfix) + "." + String(iaqSensor.version.minor_bugfix);
     Serial.println(output);
     checkIaqSensorStatus();
@@ -116,6 +134,24 @@ void readCO2() {
     Serial.print("CO2: ");
     Serial.print(co2Result);
     Serial.println("ppm");
+
+    display.clear();
+    display.setFont(ArialMT_Plain_10);
+
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.drawString(0 + 32, 0, String((int) (iaqSensor.temperature + 0.5f)) + "°");
+    display.setTextAlignment(TEXT_ALIGN_RIGHT);
+    display.drawString(64 + 32, 0, String((int) (iaqSensor.humidity + 0.5f)) + "%");
+
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.drawString(0 + 32, 12, String(iaqSensor.pressure / 100) + "hPa");
+
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.drawString(0 + 32, 24, "VOC " + String(iaqSensor.breathVocEquivalent) + "ppm");
+
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.drawString(0 + 32, 36, "CO2 " + String(co2Result) + "ppm");
+    display.display();
 }
 
 void readPM() {
@@ -125,6 +161,9 @@ void readPM() {
 // otherwise particle count is 0 and pm ~ 2
     for (int i = 0; i < 2; i++) {
         if (pm.read(&data)) {
+            if (data.particles_0_3um == 0) {
+                continue;
+            }
             Serial.println("concentration units");
             Serial.print("(std) PM 1.0: ");
             Serial.print(data.pm1_0_std);
@@ -156,6 +195,15 @@ void readPM() {
             Serial.print("> 10.0um: ");
             Serial.println(data.particles_10_0um);
             Serial.println();
+
+            display.clear();
+            display.setFont(ArialMT_Plain_10);
+            display.setTextAlignment(TEXT_ALIGN_LEFT);
+            display.drawString(0 + 32, 0, "PM 1.0 " + String(data.pm1_0_std) + "µg/m3");
+            display.drawString(0 + 32, 12, "PM 2.5 " + String(data.pm2_5_std) + "µg/m3");
+            display.drawString(0 + 32, 24, "PM 10 " + String(data.pm10_0_std) + "µg/m3");
+            display.display();
+            break;
         } else {
             Serial.println("read failed");
         }
@@ -177,15 +225,16 @@ void loop() {
     leds[0] = CRGB::Red;
     FastLED.show();
     readBME();
-    delay(1000);
+//    delay(1000);
 
     leds[0] = CRGB::Green;
     FastLED.show();
     readCO2();
-    delay(1000);
+    delay(4000);
 
     leds[0] = CRGB::Blue;
     FastLED.show();
     readPM();
-    delay(1000);
+    delay(4000);
 }
+
