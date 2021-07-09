@@ -5,11 +5,11 @@
 #include <SPI.h>
 #include <DNSServer.h>
 #include <WiFiManager.h>
+#include <bsec.h>
+#include <FastLED.h>
+#include <SSD1306Wire.h>
 #include "PM_PMS5003.h"
 #include "CO2_S8.h"
-#include "bsec.h"
-#include <FastLED.h>
-#include "SSD1306Wire.h"
 
 const uint8_t bsec_config_iaq[] = {
 #include "config/generic_33v_3s_4d/bsec_iaq.txt"
@@ -209,9 +209,10 @@ void readPM() {
             display.clear();
             display.setFont(ArialMT_Plain_10);
             display.setTextAlignment(TEXT_ALIGN_LEFT);
-            display.drawString(0 + 32, 0, "PM 1.0 " + String(data.pm1_0_std) + "µg/m3");
-            display.drawString(0 + 32, 12, "PM 2.5 " + String(data.pm2_5_std) + "µg/m3");
-            display.drawString(0 + 32, 24, "PM 10 " + String(data.pm10_0_std) + "µg/m3");
+            display.drawString(0 + 32, 0, "IAQ " + String((int) (iaqSensor.staticIaq + 0.5f)));
+            display.drawString(0 + 32, 12, "PM 1.0 " + String(data.pm1_0_std) + "µg/m3");
+            display.drawString(0 + 32, 24, "PM 2.5 " + String(data.pm2_5_std) + "µg/m3");
+            display.drawString(0 + 32, 36, "PM 10 " + String(data.pm10_0_std) + "µg/m3");
             display.display();
             break;
         } else {
