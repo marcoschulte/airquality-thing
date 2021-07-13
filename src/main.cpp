@@ -162,6 +162,12 @@ void readCO2() {
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.drawString(0 + 32, 36, "CO2 " + String(co2Result) + "ppm");
     display.display();
+
+    if (co2Result > 1000 || iaqSensor.staticIaq > 100) {
+        // yellow
+    } else if (co2Result > 1500 || iaqSensor.staticIaq > 150) {
+        // red
+    }
 }
 
 void readPM() {
