@@ -1,34 +1,37 @@
 #include "WifiMgr.h"
 
-const char *apName = "AirQuality Device";
+const char *apName = "AirQualityThing";
+std::function<void()> WifiMgr::connectedCallback = NULL;
 
-WiFiManager wifiManager;
-DoubleResetDetector *drd;
+void WifiMgr::connect(std::function<void()> _connectedCallback) {
+    connectedCallback = _connectedCallback;
 
-void WifiMgr::init() {
-    bool reset = false;
-    drd = new DoubleResetDetector(DRD_TIMEOUT, DRD_ADDRESS);
-    if (drd->detectDoubleReset()) {
-        Serial.println("Reset wifi, starting AP");
-        reset = true;
-    }
+    wifiManager.setHostname(apName);
+
+    wifiManager.setConfigPortalBlocking(false);
+    wifiManager.setSaveConfigCallback(&onConnected);
 
     boolean connected;
-    if (reset) {
+    drd = new DoubleResetDetector(DRD_TIMEOUT, DRD_ADDRESS);
+    if (drd->detectDoubleReset()) {
+        Serial.println("Reset Wifi");
         connected = wifiManager.startConfigPortal(apName);
     } else {
         connected = wifiManager.autoConnect(apName);
     }
 
     if (connected) {
-        Serial.println("Connected to wifi " + WiFi.SSID());
-    } else {
-        Serial.println("No wifi connection, sleep 30s then reboot");
-        delay(30 * 1000);
-        ESP.restart();
+        onConnected();
     }
 }
 
+void WifiMgr::onConnected() {
+    Serial.print("Connected to Wifi " + WiFi.SSID() + " with hostname " + WiFi.hostname() + " and IP ");
+    Serial.println(WiFi.localIP());
+    WifiMgr::connectedCallback();
+}
+
 void WifiMgr::tick() {
+    wifiManager.process();
     drd->loop();
 }

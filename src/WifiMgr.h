@@ -8,12 +8,20 @@
 
 #include <ESP_DoubleResetDetector.h>
 #include <WiFiManager.h>
+#include <functional>
 
 class WifiMgr {
 public:
-    void init();
-    void tick();
-};
+    void connect(std::function<void()>);
 
+    void tick();
+
+private:
+    static std::function<void()> connectedCallback;
+    WiFiManager wifiManager;
+    DoubleResetDetector *drd;
+
+    static void onConnected();
+};
 
 #endif //AIRQUALITY_ESP32_WIFIMGR_H
