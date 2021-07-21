@@ -15,6 +15,8 @@ void setup() {
     while (!Serial) { delay(10); }
     Serial.println("\n\nAirQuality device starting, rev #" + String(GIT_HASH));
 
+    Wire.begin();
+
     initWifi();
     initSensors();
 
@@ -38,11 +40,16 @@ void initSensors() {
 
 void loop() {
     wifiMgr->tick();
-    sensors->tick();
+    bool updated = sensors->tick();
 
-    Serial.println("CO2 value " + String(sensors->values()->co2));
-    Serial.println("PM values " + String(sensors->values()->pm1_0) + " " + String(sensors->values()->pm2_5) + " " +
-                   String(sensors->values()->pm10_0));
-
-    delay(2000);
+    if (updated) {
+        Serial.println("CO2 value " + String(sensors->values()->co2));
+        Serial.println("PM values " + String(sensors->values()->pm1_0) + " " + String(sensors->values()->pm2_5) + " " +
+                       String(sensors->values()->pm10_0));
+        Serial.println("IAQ " + String(sensors->values()->staticIaq)
+                       + " VOC: " + String(sensors->values()->breathVocEquivalent)
+                       + " temp.: " + String(sensors->values()->temperature)
+                       + " humidity: " + String(sensors->values()->humidity)
+                       + " pressure: " + String(sensors->values()->pressure));
+    }
 }

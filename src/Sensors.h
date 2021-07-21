@@ -5,37 +5,47 @@
 #include <Arduino.h>
 #include "CO2_S8.h"
 #include "PM_PMS5003.h"
+#include "BME680.h"
 
 class Sensors {
 public:
     struct SensorValues {
         int co2;
         uint16_t pm1_0, pm2_5, pm10_0;
+        float temperature, pressure, humidity, staticIaq, breathVocEquivalent;
     };
 
     void init();
 
-    void tick();
+    bool tick();
 
     Sensors::SensorValues *values();
 
 private:
-    void resetValues();
-
-    void updateCO2();
-
     SensorValues sensorValues;
 
+    void resetValues();
+
+    bool updateCO2();
+
+    unsigned long lastCO2Read = 1LL << 31;
     CO2_S8 co2S8 = CO2_S8(D4, D3);
+
+
+    bool updatePM();
+
+    void doReadPM();
 
     PM_PMS5003 pm = PM_PMS5003(D5, D6);
     bool pmEnabled = false;
-    unsigned long lastPmRead = 1LL << 31;;
+    unsigned long lastPmRead = 1LL << 31;
     unsigned long pmWarmupStartedAt = 0;
 
-    void updatePM();
+    BME680 bme680;
 
-    void doReadPM();
+    bool updateBME();
+
+    unsigned long lastBmeRead = 1LL << 31;
 };
 
 
