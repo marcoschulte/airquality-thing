@@ -20,7 +20,6 @@ void BME680::init() {
             BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_TEMPERATURE,
             BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY,
     };
-iaqSensor.
     iaqSensor.updateSubscription(sensorList, 10, BSEC_SAMPLE_RATE_LP);
     checkIaqSensorStatus();
 }
