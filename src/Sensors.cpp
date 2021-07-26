@@ -1,5 +1,7 @@
 #include "Sensors.h"
 
+#define HEIGHT_ABOVE_SEA_LEVEL 525
+
 #define CO2_EVERY_MS 5 * 1000
 
 #define PM_EVERY_MS 30 * 1000
@@ -97,8 +99,8 @@ bool Sensors::updateBME() {
             sensorValues.humidity = bme680.iaqSensor.humidity;
             sensorValues.staticIaq = bme680.iaqSensor.staticIaq;
             sensorValues.breathVocEquivalent = bme680.iaqSensor.breathVocEquivalent;
+            sensorValues.pressureSeaLevel = calcPressureSeaLevel(sensorValues.pressure, sensorValues.temperature);
             lastBmeRead = millis();
-
             return true;
         } else {
             Serial.println("BME read failure");
@@ -106,6 +108,11 @@ bool Sensors::updateBME() {
     }
 
     return false;
+}
+
+float Sensors::calcPressureSeaLevel(float pressure, float temp) {
+    return pressure / pow((1. - 0.0065 * HEIGHT_ABOVE_SEA_LEVEL / (temp + 273.15 + 0.0065 * HEIGHT_ABOVE_SEA_LEVEL)),
+                          (0.03416 / 0.0065));
 }
 
 Sensors::SensorValues *Sensors::values() {
@@ -120,6 +127,7 @@ void Sensors::resetValues() {
             .pm10_0 = NULL,
             .temperature=NULL,
             .pressure=NULL,
+            .pressureSeaLevel=NULL,
             .humidity=NULL,
             .staticIaq=NULL,
             .breathVocEquivalent=NULL

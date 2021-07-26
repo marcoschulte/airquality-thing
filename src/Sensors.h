@@ -12,7 +12,7 @@ public:
     struct SensorValues {
         int co2;
         uint16_t pm1_0, pm2_5, pm10_0;
-        float temperature, pressure, humidity, staticIaq, breathVocEquivalent;
+        float temperature, pressure, pressureSeaLevel, humidity, staticIaq, breathVocEquivalent;
     };
 
     void init();
@@ -46,6 +46,8 @@ private:
     bool updateBME();
 
     unsigned long lastBmeRead = 1LL << 31;
+
+    float calcPressureSeaLevel(float pressure, float temperature);
 };
 
 

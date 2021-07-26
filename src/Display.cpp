@@ -20,6 +20,8 @@ void Display::tick() {
 }
 
 void Display::displayFrame1() {
+    Sensors::SensorValues *sensorValues = sensors->values();
+
     display.clear();
     display.setFont(ArialMT_Plain_10);
 
@@ -40,6 +42,8 @@ void Display::displayFrame1() {
 }
 
 void Display::displayFrame2() {
+    Sensors::SensorValues *sensorValues = sensors->values();
+
     display.clear();
     display.setFont(ArialMT_Plain_10);
 

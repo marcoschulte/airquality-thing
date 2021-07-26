@@ -6,7 +6,7 @@
 
 WifiMgr wifiMgr;
 Sensors sensors;
-Display display(sensors.values());
+Display display(&sensors);
 
 void initWifi();
 
@@ -42,6 +42,7 @@ void initSensors() {
 }
 
 void initDisplay() {
+    Serial.println("Initializing Display");
     display.init();
 }
 
@@ -59,6 +60,7 @@ void loop() {
                        + " VOC: " + String(sensors.values()->breathVocEquivalent)
                        + " temp.: " + String(sensors.values()->temperature)
                        + " humidity: " + String(sensors.values()->humidity)
-                       + " pressure: " + String(sensors.values()->pressure));
+                       + " pressure: " + String(sensors.values()->pressure)
+                       + " pressure SL: " + String(sensors.values()->pressureSeaLevel));
     }
 }

@@ -7,7 +7,7 @@
 
 class Display {
 public:
-    Display(Sensors::SensorValues *sensorValues) : sensorValues(sensorValues) {};
+    Display(Sensors *sensors) : sensors(sensors) {};
 
     void init();
 
@@ -15,7 +15,7 @@ public:
 
 private:
     SSD1306Wire display = SSD1306Wire(0x3c, SDA, SCL);
-    Sensors::SensorValues *sensorValues;
+    Sensors *sensors;
     int frame = 0;
     unsigned long lastFrame = 1LL << 31;
 

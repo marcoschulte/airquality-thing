@@ -2,7 +2,7 @@
 #include "BME680.h"
 
 void BME680::init() {
-    iaqSensor.setTemperatureOffset(4);
+    iaqSensor.setTemperatureOffset(5.2);
     iaqSensor.begin(BME680_I2C_ADDR_SECONDARY, Wire);
 
     checkIaqSensorStatus();
