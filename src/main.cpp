@@ -52,11 +52,11 @@ void loop() {
     display.tick();
 
     if (updated) {
-        Serial.println("CO2 value " + String(sensors.values()->co2));
-        Serial.println("PM values " + String(sensors.values()->pm1_0)
+        Serial.print("CO2 value " + String(sensors.values()->co2));
+        Serial.print(" PM values " + String(sensors.values()->pm1_0)
                        + " " + String(sensors.values()->pm2_5)
                        + " " + String(sensors.values()->pm10_0));
-        Serial.println("IAQ " + String(sensors.values()->staticIaq)
+        Serial.println(" IAQ " + String(sensors.values()->staticIaq)
                        + " VOC: " + String(sensors.values()->breathVocEquivalent)
                        + " temp.: " + String(sensors.values()->temperature)
                        + " humidity: " + String(sensors.values()->humidity)

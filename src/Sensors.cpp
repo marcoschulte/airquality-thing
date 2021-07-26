@@ -48,13 +48,13 @@ bool Sensors::updatePM() {
         if (millis() - pmWarmupStartedAt > PM_WARMUP_MS) {
             Serial.println("PM read");
 
-            doReadPM();
+            bool success = doReadPM();
 
             Serial.println("PM sleep");
             pm.sleep();
             pmEnabled = false;
             lastPmRead = millis();
-            return true;
+            return success;
         }
     } else {
         if (millis() - lastPmRead > PM_EVERY_MS) {
@@ -68,7 +68,7 @@ bool Sensors::updatePM() {
     return false;
 }
 
-void Sensors::doReadPM() {
+bool Sensors::doReadPM() {
     PM_PMS5003::data data;
     for (int i = 0; i < 3; i++) {
         if (pm.read(&data)) {
@@ -80,13 +80,19 @@ void Sensors::doReadPM() {
             sensorValues.pm2_5 = data.pm2_5_std;
             sensorValues.pm10_0 = data.pm10_0_std;
 
-            return;
+            return true;
         } else {
             Serial.println("PM read failure");
         }
     }
 
     Serial.println("PM read unsuccessful after 3 retries");
+
+    sensorValues.pm1_0 = NULL;
+    sensorValues.pm2_5 = NULL;
+    sensorValues.pm10_0 = NULL;
+
+    return false;
 }
 
 bool Sensors::updateBME() {
@@ -94,16 +100,33 @@ bool Sensors::updateBME() {
         bool success = bme680.readBME();
 
         if (success) {
+            lastBmeRead = millis();
+
             sensorValues.temperature = bme680.iaqSensor.temperature;
             sensorValues.pressure = bme680.iaqSensor.pressure / 100;
-            sensorValues.humidity = bme680.iaqSensor.humidity;
-            sensorValues.staticIaq = bme680.iaqSensor.staticIaq;
-            sensorValues.breathVocEquivalent = bme680.iaqSensor.breathVocEquivalent;
             sensorValues.pressureSeaLevel = calcPressureSeaLevel(sensorValues.pressure, sensorValues.temperature);
-            lastBmeRead = millis();
+            sensorValues.humidity = bme680.iaqSensor.humidity;
+
+            if (bme680.iaqSensor.iaqAccuracy > 0) {
+                sensorValues.staticIaq = bme680.iaqSensor.staticIaq;
+            } else {
+                sensorValues.staticIaq = NULL;
+            }
+            if (bme680.iaqSensor.breathVocAccuracy > 0) {
+                sensorValues.breathVocEquivalent = bme680.iaqSensor.breathVocEquivalent;
+            } else {
+                sensorValues.breathVocEquivalent = NULL;
+            }
             return true;
         } else {
             Serial.println("BME read failure");
+
+            sensorValues.temperature = NULL;
+            sensorValues.pressure = NULL;
+            sensorValues.pressureSeaLevel = NULL;
+            sensorValues.humidity = NULL;
+            sensorValues.staticIaq = NULL;
+            sensorValues.breathVocEquivalent = NULL;
         }
     }
 

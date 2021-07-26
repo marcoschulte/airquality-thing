@@ -34,7 +34,7 @@ private:
 
     bool updatePM();
 
-    void doReadPM();
+    bool doReadPM();
 
     PM_PMS5003 pm = PM_PMS5003(D5, D6);
     bool pmEnabled = false;
