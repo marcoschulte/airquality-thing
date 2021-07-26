@@ -7,12 +7,19 @@
 #include "PM_PMS5003.h"
 #include "BME680.h"
 
+
 class Sensors {
 public:
+    typedef enum {
+        OK = 0,
+        NOK = -1
+    } sensor_status_t;
+
     struct SensorValues {
         int co2;
         uint16_t pm1_0, pm2_5, pm10_0;
         float temperature, pressure, pressureSeaLevel, humidity, staticIaq, breathVocEquivalent;
+        sensor_status_t co2Status, bmeStatus, pmsStatus;
     };
 
     void init();

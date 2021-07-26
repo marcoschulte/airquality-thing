@@ -3,10 +3,12 @@
 #include "WifiMgr.h"
 #include "Sensors.h"
 #include "Display.h"
+#include "AirQualitityServer.h"
 
 WifiMgr wifiMgr;
 Sensors sensors;
 Display display(&sensors);
+AirQualitityServer server;
 
 void initWifi();
 
@@ -28,7 +30,8 @@ void setup() {
 }
 
 void connected() {
-    Serial.println("HOOOORAY Wifi connected");
+    Serial.println("WiFi connected. Starting server");
+    server.start(&sensors);
 }
 
 void initWifi() {
@@ -50,6 +53,7 @@ void loop() {
     wifiMgr.tick();
     bool updated = sensors.tick();
     display.tick();
+    server.tick();
 
     if (updated) {
         Serial.print("CO2 value " + String(sensors.values()->co2));

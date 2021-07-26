@@ -33,8 +33,10 @@ bool Sensors::updateCO2() {
         if (co2 == -1) {
             Serial.println("S8 read failure");
             sensorValues.co2 = NULL;
+            sensorValues.co2Status = NOK;
         } else {
             sensorValues.co2 = co2;
+            sensorValues.co2Status = OK;
             lastCO2Read = millis();
             return true;
         }
@@ -79,6 +81,7 @@ bool Sensors::doReadPM() {
             sensorValues.pm1_0 = data.pm1_0_std;
             sensorValues.pm2_5 = data.pm2_5_std;
             sensorValues.pm10_0 = data.pm10_0_std;
+            sensorValues.pmsStatus = OK;
 
             return true;
         } else {
@@ -91,6 +94,7 @@ bool Sensors::doReadPM() {
     sensorValues.pm1_0 = NULL;
     sensorValues.pm2_5 = NULL;
     sensorValues.pm10_0 = NULL;
+    sensorValues.pmsStatus = NOK;
 
     return false;
 }
@@ -117,6 +121,9 @@ bool Sensors::updateBME() {
             } else {
                 sensorValues.breathVocEquivalent = NULL;
             }
+
+            sensorValues.bmeStatus = OK;
+
             return true;
         } else {
             Serial.println("BME read failure");
@@ -127,6 +134,7 @@ bool Sensors::updateBME() {
             sensorValues.humidity = NULL;
             sensorValues.staticIaq = NULL;
             sensorValues.breathVocEquivalent = NULL;
+            sensorValues.bmeStatus = NOK;
         }
     }
 
@@ -153,6 +161,9 @@ void Sensors::resetValues() {
             .pressureSeaLevel=NULL,
             .humidity=NULL,
             .staticIaq=NULL,
-            .breathVocEquivalent=NULL
+            .breathVocEquivalent=NULL,
+            .co2Status = NOK,
+            .bmeStatus = NOK,
+            .pmsStatus = NOK,
     };
 }
