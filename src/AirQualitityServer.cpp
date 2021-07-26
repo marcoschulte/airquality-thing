@@ -7,11 +7,11 @@
 ESP8266WebServer http_server = ESP8266WebServer(HTTP_SERVER_PORT);
 Sensors *staticSensors;
 
-char *commentOnError(Sensors::sensor_status_t status) {
-    if (status == Sensors::OK) {
-        return "";
-    } else {
+char *commentOnNull(float value) {
+    if (value == NULL) {
         return "# ";
+    } else {
+        return "";
     }
 }
 
@@ -43,16 +43,16 @@ void handlePrometheusClient() {
     char response[BUFSIZE];
     Sensors::SensorValues *values = staticSensors->values();
     snprintf(response, BUFSIZE, response_template,
-             commentOnError(values->bmeStatus), DEVICE_NAME, values->temperature,
-             commentOnError(values->bmeStatus), DEVICE_NAME, values->pressure,
-             commentOnError(values->bmeStatus), DEVICE_NAME, values->pressureSeaLevel,
-             commentOnError(values->bmeStatus), DEVICE_NAME, values->humidity,
-             commentOnError(values->bmeStatus), DEVICE_NAME, values->staticIaq,
-             commentOnError(values->bmeStatus), DEVICE_NAME, values->breathVocEquivalent,
-             commentOnError(values->co2Status), DEVICE_NAME, values->co2,
-             commentOnError(values->pmsStatus), DEVICE_NAME, values->pm1_0,
-             commentOnError(values->pmsStatus), DEVICE_NAME, values->pm2_5,
-             commentOnError(values->pmsStatus), DEVICE_NAME, values->pm10_0
+             commentOnNull(values->temperature), DEVICE_NAME, values->temperature,
+             commentOnNull(values->pressure), DEVICE_NAME, values->pressure,
+             commentOnNull(values->pressureSeaLevel), DEVICE_NAME, values->pressureSeaLevel,
+             commentOnNull(values->humidity), DEVICE_NAME, values->humidity,
+             commentOnNull(values->staticIaq), DEVICE_NAME, values->staticIaq,
+             commentOnNull(values->breathVocEquivalent), DEVICE_NAME, values->breathVocEquivalent,
+             commentOnNull(values->co2), DEVICE_NAME, values->co2,
+             commentOnNull(values->pm1_0), DEVICE_NAME, values->pm1_0,
+             commentOnNull(values->pm2_5), DEVICE_NAME, values->pm2_5,
+             commentOnNull(values->pm10_0), DEVICE_NAME, values->pm10_0
     );
     http_server.send(200, "text/plain; charset=utf-8", response);
 }
