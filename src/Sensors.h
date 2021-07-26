@@ -6,7 +6,7 @@
 #include "CO2_S8.h"
 #include "PM_PMS5003.h"
 #include "BME680.h"
-
+#include "AQICalculator.h"
 
 class Sensors {
 public:
@@ -18,7 +18,7 @@ public:
     struct SensorValues {
         int co2;
         uint16_t pm1_0, pm2_5, pm10_0;
-        float temperature, pressure, pressureSeaLevel, humidity, staticIaq, breathVocEquivalent;
+        float temperature, pressure, pressureSeaLevel, humidity, voc, aqiVoc, aqiPM2_5, aqiPM10_0, aqiCO2, aqiMax;
         sensor_status_t co2Status, bmeStatus, pmsStatus;
     };
 
@@ -30,6 +30,7 @@ public:
 
 private:
     SensorValues sensorValues;
+    AQICalculator aqiCalculator;
 
     void resetValues();
 
@@ -55,6 +56,8 @@ private:
     unsigned long lastBmeRead = 1LL << 31;
 
     float calcPressureSeaLevel(float pressure, float temperature);
+
+    void updateAQIMax();
 };
 
 

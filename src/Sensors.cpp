@@ -24,6 +24,8 @@ bool Sensors::tick() {
     updated = updatePM() || updated;
     updated = updateBME() || updated;
 
+    updateAQIMax();
+
     return updated;
 }
 
@@ -33,9 +35,11 @@ bool Sensors::updateCO2() {
         if (co2 == -1) {
             Serial.println("S8 read failure");
             sensorValues.co2 = NULL;
+            sensorValues.aqiCO2 = NULL;
             sensorValues.co2Status = NOK;
         } else {
             sensorValues.co2 = co2;
+            sensorValues.aqiCO2 = aqiCalculator.calculateAQI(sensorValues.co2, aqiCalculator.thresholdsCO2);
             sensorValues.co2Status = OK;
             lastCO2Read = millis();
             return true;
@@ -81,6 +85,8 @@ bool Sensors::doReadPM() {
             sensorValues.pm1_0 = data.pm1_0_std;
             sensorValues.pm2_5 = data.pm2_5_std;
             sensorValues.pm10_0 = data.pm10_0_std;
+            sensorValues.aqiPM2_5 = aqiCalculator.calculateAQI(sensorValues.pm2_5, aqiCalculator.thresholdsPM2_5);
+            sensorValues.aqiPM10_0 = aqiCalculator.calculateAQI(sensorValues.pm10_0, aqiCalculator.thresholdsPM10_0);
             sensorValues.pmsStatus = OK;
 
             return true;
@@ -94,6 +100,8 @@ bool Sensors::doReadPM() {
     sensorValues.pm1_0 = NULL;
     sensorValues.pm2_5 = NULL;
     sensorValues.pm10_0 = NULL;
+    sensorValues.aqiPM2_5 = NULL;
+    sensorValues.aqiPM10_0 = NULL;
     sensorValues.pmsStatus = NOK;
 
     return false;
@@ -112,14 +120,14 @@ bool Sensors::updateBME() {
             sensorValues.humidity = bme680.iaqSensor.humidity;
 
             if (bme680.iaqSensor.iaqAccuracy > 0) {
-                sensorValues.staticIaq = bme680.iaqSensor.staticIaq;
+                sensorValues.aqiVoc = bme680.iaqSensor.staticIaq;
             } else {
-                sensorValues.staticIaq = NULL;
+                sensorValues.aqiVoc = NULL;
             }
             if (bme680.iaqSensor.breathVocAccuracy > 0) {
-                sensorValues.breathVocEquivalent = bme680.iaqSensor.breathVocEquivalent;
+                sensorValues.voc = bme680.iaqSensor.breathVocEquivalent;
             } else {
-                sensorValues.breathVocEquivalent = NULL;
+                sensorValues.voc = NULL;
             }
 
             sensorValues.bmeStatus = OK;
@@ -132,8 +140,8 @@ bool Sensors::updateBME() {
             sensorValues.pressure = NULL;
             sensorValues.pressureSeaLevel = NULL;
             sensorValues.humidity = NULL;
-            sensorValues.staticIaq = NULL;
-            sensorValues.breathVocEquivalent = NULL;
+            sensorValues.aqiVoc = NULL;
+            sensorValues.voc = NULL;
             sensorValues.bmeStatus = NOK;
         }
     }
@@ -144,6 +152,17 @@ bool Sensors::updateBME() {
 float Sensors::calcPressureSeaLevel(float pressure, float temp) {
     return pressure / pow((1. - 0.0065 * HEIGHT_ABOVE_SEA_LEVEL / (temp + 273.15 + 0.0065 * HEIGHT_ABOVE_SEA_LEVEL)),
                           (0.03416 / 0.0065));
+}
+
+void Sensors::updateAQIMax() {
+    float aqiMax = NULL;
+
+    aqiMax = max(sensorValues.aqiVoc, aqiMax);
+    aqiMax = max(sensorValues.aqiCO2, aqiMax);
+    aqiMax = max(sensorValues.aqiPM2_5, aqiMax);
+    aqiMax = max(sensorValues.aqiPM10_0, aqiMax);
+
+    sensorValues.aqiMax = aqiMax;
 }
 
 Sensors::SensorValues *Sensors::values() {
@@ -160,8 +179,11 @@ void Sensors::resetValues() {
             .pressure=NULL,
             .pressureSeaLevel=NULL,
             .humidity=NULL,
-            .staticIaq=NULL,
-            .breathVocEquivalent=NULL,
+            .voc=NULL,
+            .aqiVoc=NULL,
+            .aqiPM2_5=NULL,
+            .aqiPM10_0=NULL,
+            .aqiCO2=NULL,
             .co2Status = NOK,
             .bmeStatus = NOK,
             .pmsStatus = NOK,

@@ -56,15 +56,19 @@ void loop() {
     server.tick();
 
     if (updated) {
-        Serial.print("CO2 value " + String(sensors.values()->co2));
-        Serial.print(" PM values " + String(sensors.values()->pm1_0)
-                       + " " + String(sensors.values()->pm2_5)
-                       + " " + String(sensors.values()->pm10_0));
-        Serial.println(" IAQ " + String(sensors.values()->staticIaq)
-                       + " VOC: " + String(sensors.values()->breathVocEquivalent)
-                       + " temp.: " + String(sensors.values()->temperature)
-                       + " humidity: " + String(sensors.values()->humidity)
-                       + " pressure: " + String(sensors.values()->pressure)
-                       + " pressure SL: " + String(sensors.values()->pressureSeaLevel));
+        Serial.print("CO2 " + String(sensors.values()->co2));
+        Serial.print(", PM " + String(sensors.values()->pm1_0)
+                     + " " + String(sensors.values()->pm2_5)
+                     + " " + String(sensors.values()->pm10_0));
+        Serial.println(", AQI VOC " + String(sensors.values()->aqiVoc)
+                       + ", AQI CO2 " + String(sensors.values()->aqiCO2)
+                       + ", AQI PM 2.5 " + String(sensors.values()->aqiPM2_5)
+                       + ", AQI PM 10.0 " + String(sensors.values()->aqiPM10_0)
+                       + ", AQI Max " + String(sensors.values()->aqiMax)
+                       + ", VOC: " + String(sensors.values()->voc)
+                       + ", temp.: " + String(sensors.values()->temperature)
+                       + ", humidity: " + String(sensors.values()->humidity)
+                       + ", pressure: " + String(sensors.values()->pressure)
+                       + ", pressure SL: " + String(sensors.values()->pressureSeaLevel));
     }
 }

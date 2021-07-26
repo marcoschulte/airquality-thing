@@ -26,8 +26,16 @@ void handlePrometheusClient() {
             "%spressure_sl_hpa{device=\"%s\"} %f\n"
             "# TYPE humidity_percent gauge\n"
             "%shumidity_percent{device=\"%s\"} %f\n"
-            "# TYPE static_iaq gauge\n"
-            "%sstatic_iaq{device=\"%s\"} %f\n"
+            "# TYPE iaq_voc gauge\n"
+            "%siaq_voc{device=\"%s\"} %f\n"
+            "# TYPE iaq_co2 gauge\n"
+            "%siaq_co2{device=\"%s\"} %f\n"
+            "# TYPE iaq_pm2_5 gauge\n"
+            "%siaq_pm2_5{device=\"%s\"} %f\n"
+            "# TYPE iaq_pm10_0 gauge\n"
+            "%siaq_pm10_0{device=\"%s\"} %f\n"
+            "# TYPE iaq_max gauge\n"
+            "%siaq_max{device=\"%s\"} %f\n"
             "# TYPE voc_ppm gauge\n"
             "%svoc_ppm{device=\"%s\"} %f\n"
             "# TYPE co2_ppm gauge\n"
@@ -47,8 +55,12 @@ void handlePrometheusClient() {
              commentOnNull(values->pressure), DEVICE_NAME, values->pressure,
              commentOnNull(values->pressureSeaLevel), DEVICE_NAME, values->pressureSeaLevel,
              commentOnNull(values->humidity), DEVICE_NAME, values->humidity,
-             commentOnNull(values->staticIaq), DEVICE_NAME, values->staticIaq,
-             commentOnNull(values->breathVocEquivalent), DEVICE_NAME, values->breathVocEquivalent,
+             commentOnNull(values->aqiVoc), DEVICE_NAME, values->aqiVoc,
+             commentOnNull(values->aqiCO2), DEVICE_NAME, values->aqiCO2,
+             commentOnNull(values->aqiPM2_5), DEVICE_NAME, values->aqiPM2_5,
+             commentOnNull(values->aqiPM10_0), DEVICE_NAME, values->aqiPM10_0,
+             commentOnNull(values->aqiMax), DEVICE_NAME, values->aqiMax,
+             commentOnNull(values->voc), DEVICE_NAME, values->voc,
              commentOnNull(values->co2), DEVICE_NAME, values->co2,
              commentOnNull(values->pm1_0), DEVICE_NAME, values->pm1_0,
              commentOnNull(values->pm2_5), DEVICE_NAME, values->pm2_5,

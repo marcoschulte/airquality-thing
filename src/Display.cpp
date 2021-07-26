@@ -34,7 +34,7 @@ void Display::displayFrame1() {
     display.drawString(0 + 32, 12, String(sensorValues->pressure) + "hPa");
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
-    display.drawString(0 + 32, 24, "VOC " + String(sensorValues->breathVocEquivalent) + "ppm");
+    display.drawString(0 + 32, 24, "VOC " + String(sensorValues->voc) + "ppm");
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.drawString(0 + 32, 36, "CO2 " + String(sensorValues->co2) + "ppm");
@@ -48,7 +48,7 @@ void Display::displayFrame2() {
     display.setFont(ArialMT_Plain_10);
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
-    display.drawString(0 + 32, 0, "IAQ " + String((int) (sensorValues->staticIaq + 0.5f)));
+    display.drawString(0 + 32, 0, "IAQ " + String((int) (sensorValues->aqiMax + 0.5f)));
     display.drawString(0 + 32, 12, "PM 1.0 " + String(sensorValues->pm1_0) + "µg/m3");
     display.drawString(0 + 32, 24, "PM 2.5 " + String(sensorValues->pm2_5) + "µg/m3");
     display.drawString(0 + 32, 36, "PM 10 " + String(sensorValues->pm10_0) + "µg/m3");
