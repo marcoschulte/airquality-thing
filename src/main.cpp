@@ -4,11 +4,13 @@
 #include "Sensors.h"
 #include "Display.h"
 #include "AirQualitityServer.h"
+#include "StatusLed.h"
 
 WifiMgr wifiMgr;
 Sensors sensors;
 Display display(&sensors);
 AirQualitityServer server;
+StatusLed statusLed(&sensors);
 
 void initWifi();
 
@@ -27,6 +29,7 @@ void setup() {
     initDisplay();
     display.tick();
     initSensors();
+    statusLed.init();
 }
 
 void connected() {
@@ -54,6 +57,7 @@ void loop() {
     bool updated = sensors.tick();
     display.tick();
     server.tick();
+    statusLed.tick();
 
     if (updated) {
         Serial.print("CO2 " + String(sensors.values()->co2));
