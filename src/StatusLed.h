@@ -2,7 +2,7 @@
 #ifndef AIRQUALITY_ESP32_STATUSLED_H
 #define AIRQUALITY_ESP32_STATUSLED_H
 
-#include <FastLED.h>
+#include <Adafruit_NeoPixel.h>
 #include "Sensors.h"
 
 #define LED_PIN     D7
@@ -18,7 +18,7 @@ public:
 
 private:
     Sensors *sensors;
-    CRGB leds[NUM_LEDS];
+    Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 };
 
 

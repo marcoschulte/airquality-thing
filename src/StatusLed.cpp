@@ -1,12 +1,15 @@
 
 #include "StatusLed.h"
 
+Adafruit_NeoPixel *pixels;
+
 void StatusLed::init() {
-    FastLED.addLeds<NEOPIXEL, LED_PIN>(leds, NUM_LEDS);
-    FastLED.setBrightness(10);
-    leds[0] = CRGB::Red;
-    FastLED.show();
+    pixels.begin();
+    pixels.setPixelColor(0, pixels.ColorHSV(100, 100, 100));
+    pixels.show();
 }
 
 void StatusLed::tick() {
+    pixels.setPixelColor(0, pixels.ColorHSV(100, 100, 100));
+    pixels.show();
 }
