@@ -19,6 +19,10 @@ public:
 private:
     Sensors *sensors;
     Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+    float easeOutCirc(float x);
+    void readAQIFromSerial();
+    uint16_t aqiToHue(int aqi);
 };
 
 
