@@ -23,13 +23,14 @@ void setup() {
     while (!Serial) { delay(10); }
     Serial.println("\n\nAirQuality device starting, rev #" + String(GIT_HASH));
 
+    statusLed.init();
+
     Wire.begin();
 
     initWifi();
     initDisplay();
     display.tick();
     initSensors();
-    statusLed.init();
 }
 
 void connected() {
@@ -57,7 +58,6 @@ void loop() {
     bool updated = sensors.tick();
     display.tick();
     server.tick();
-    statusLed.tick();
 
     if (updated) {
         Serial.print("CO2 " + String(sensors.values()->co2));

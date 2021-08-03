@@ -14,14 +14,19 @@ public:
 
     void init();
 
-    void tick();
+    void internalTick();
 
 private:
     Sensors *sensors;
     Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
+    uint16_t hueSetpoint, hueCur = 100;
+    uint8_t satSetpoint, satCur = 100;
+    uint8_t valSetpoint, valCur = 100;
 
     float easeOutCirc(float x);
+
     void readAQIFromSerial();
+
     uint16_t aqiToHue(int aqi);
 };
 
