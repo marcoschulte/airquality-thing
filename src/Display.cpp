@@ -26,9 +26,9 @@ void Display::displayFrame1() {
     display.setFont(ArialMT_Plain_10);
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
-    display.drawString(0 + 32, 0, String((int) (sensorValues->temperature_bme680 + 0.5f)) + "°");
+    display.drawString(0 + 32, 0, String((int) (sensorValues->temperature_sht3x + 0.5f)) + "°");
     display.setTextAlignment(TEXT_ALIGN_RIGHT);
-    display.drawString(64 + 32, 0, String((int) (sensorValues->humidity_bme680 + 0.5f)) + "%");
+    display.drawString(64 + 32, 0, String((int) (sensorValues->humidity_sht3x + 0.5f)) + "%");
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.drawString(0 + 32, 12, String(sensorValues->pressureSeaLevel) + "hPa");

@@ -16,7 +16,7 @@ char *commentOnNull(float value) {
 }
 
 void handlePrometheusClient() {
-    static size_t const BUFSIZE = 1024;
+    static size_t const BUFSIZE = 1200;
     static char const *response_template =
             "# TYPE temperature_celsius gauge\n"
             "%stemperature_celsius{device=\"%s\"} %f\n"
@@ -45,16 +45,19 @@ void handlePrometheusClient() {
             "# TYPE pm2_5_ug_m3 gauge\n"
             "%spm2_5_ug_m3{device=\"%s\"} %i\n"
             "# TYPE pm10_0_ug_m3 gauge\n"
-            "%spm10_0_ug_m3{device=\"%s\"} %i\n";
-
+            "%spm10_0_ug_m3{device=\"%s\"} %i\n"
+            "# TYPE temperature_bme_celsius gauge\n"
+            "%stemperature_bme_celsius{device=\"%s\"} %f\n"
+            "# TYPE humidity_bme_percent gauge\n"
+            "%shumidity_bme_percent{device=\"%s\"} %f\n";
 
     char response[BUFSIZE];
     Sensors::SensorValues *values = staticSensors->values();
     snprintf(response, BUFSIZE, response_template,
-             commentOnNull(values->temperature_bme680), DEVICE_NAME, values->temperature_bme680,
+             commentOnNull(values->temperature_sht3x), DEVICE_NAME, values->temperature_sht3x,
              commentOnNull(values->pressure), DEVICE_NAME, values->pressure,
              commentOnNull(values->pressureSeaLevel), DEVICE_NAME, values->pressureSeaLevel,
-             commentOnNull(values->humidity_bme680), DEVICE_NAME, values->humidity_bme680,
+             commentOnNull(values->humidity_sht3x), DEVICE_NAME, values->humidity_sht3x,
              commentOnNull(values->aqiVoc), DEVICE_NAME, values->aqiVoc,
              commentOnNull(values->aqiCO2), DEVICE_NAME, values->aqiCO2,
              commentOnNull(values->aqiPM2_5), DEVICE_NAME, values->aqiPM2_5,
@@ -64,7 +67,9 @@ void handlePrometheusClient() {
              commentOnNull(values->co2), DEVICE_NAME, values->co2,
              commentOnNull(values->pm1_0), DEVICE_NAME, values->pm1_0,
              commentOnNull(values->pm2_5), DEVICE_NAME, values->pm2_5,
-             commentOnNull(values->pm10_0), DEVICE_NAME, values->pm10_0
+             commentOnNull(values->pm10_0), DEVICE_NAME, values->pm10_0,
+             commentOnNull(values->temperature_bme680), DEVICE_NAME, values->temperature_bme680,
+             commentOnNull(values->humidity_bme680), DEVICE_NAME, values->humidity_bme680
     );
     http_server.send(200, "text/plain; charset=utf-8", response);
 }
