@@ -2,12 +2,14 @@
 
 #define HEIGHT_ABOVE_SEA_LEVEL 525
 
-#define CO2_EVERY_MS 5 * 1000
+#define CO2_EVERY_MS 3 * 1000
 
 #define PM_EVERY_MS 300 * 1000
 #define PM_WARMUP_MS 30 * 1000
 
 #define BME_EVERY_MS 3 * 1000
+
+#define SHT_EVERY_MS 3 * 1000
 
 void Sensors::init() {
     resetValues();
@@ -20,9 +22,11 @@ void Sensors::init() {
 bool Sensors::tick() {
     bool updated = false;
 
+    // put bme first, as timing for bme is critical
+    updated = updateBME() || updated;
     updated = updateCO2() || updated;
     updated = updatePM() || updated;
-    updated = updateBME() || updated;
+    updated = updateSHT() || updated;
 
     updateAQIMax();
 
@@ -114,10 +118,11 @@ bool Sensors::updateBME() {
         if (success) {
             lastBmeRead = millis();
 
-            sensorValues.temperature = bme680.iaqSensor.temperature;
+            sensorValues.temperature_bme680 = bme680.iaqSensor.temperature;
             sensorValues.pressure = bme680.iaqSensor.pressure / 100;
-            sensorValues.pressureSeaLevel = calcPressureSeaLevel(sensorValues.pressure, sensorValues.temperature);
-            sensorValues.humidity = bme680.iaqSensor.humidity;
+            sensorValues.pressureSeaLevel = calcPressureSeaLevel(sensorValues.pressure,
+                                                                 sensorValues.temperature_bme680);
+            sensorValues.humidity_bme680 = bme680.iaqSensor.humidity;
 
             if (bme680.iaqSensor.iaqAccuracy > 0) {
                 sensorValues.aqiVoc = bme680.iaqSensor.staticIaq;
@@ -136,13 +141,33 @@ bool Sensors::updateBME() {
         } else {
             Serial.println("BME read failure");
 
-            sensorValues.temperature = NULL;
+            sensorValues.temperature_bme680 = NULL;
             sensorValues.pressure = NULL;
             sensorValues.pressureSeaLevel = NULL;
-            sensorValues.humidity = NULL;
+            sensorValues.humidity_bme680 = NULL;
             sensorValues.aqiVoc = NULL;
             sensorValues.voc = NULL;
             sensorValues.bmeStatus = NOK;
+        }
+    }
+
+    return false;
+}
+
+bool Sensors::updateSHT() {
+    if (millis() - lastSHTRead > SHT_EVERY_MS) {
+        SHT::data data;
+        bool success = sht.read(&data);
+        if (success) {
+            sensorValues.temperature_sht3x = data.temperature;
+            sensorValues.humidity_sht3x = data.humidity;
+            sensorValues.shtStatus = OK;
+            lastSHTRead = millis();
+            return true;
+        } else {
+            sensorValues.temperature_sht3x = NULL;
+            sensorValues.humidity_sht3x = NULL;
+            sensorValues.shtStatus = NOK;
         }
     }
 
@@ -175,10 +200,12 @@ void Sensors::resetValues() {
             .pm1_0 = NULL,
             .pm2_5 = NULL,
             .pm10_0 = NULL,
-            .temperature=NULL,
+            .temperature_bme680=NULL,
+            .temperature_sht3x=NULL,
             .pressure=NULL,
             .pressureSeaLevel=NULL,
-            .humidity=NULL,
+            .humidity_bme680=NULL,
+            .humidity_sht3x=NULL,
             .voc=NULL,
             .aqiVoc=NULL,
             .aqiPM2_5=NULL,
@@ -187,5 +214,6 @@ void Sensors::resetValues() {
             .co2Status = NOK,
             .bmeStatus = NOK,
             .pmsStatus = NOK,
+            .shtStatus = NOK,
     };
 }

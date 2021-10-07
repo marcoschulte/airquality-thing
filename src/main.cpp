@@ -70,8 +70,10 @@ void loop() {
                        + ", AQI PM 10.0 " + String(sensors.values()->aqiPM10_0)
                        + ", AQI Max " + String(sensors.values()->aqiMax)
                        + ", VOC: " + String(sensors.values()->voc)
-                       + ", temp.: " + String(sensors.values()->temperature)
-                       + ", humidity: " + String(sensors.values()->humidity)
+                       + ", temp. bme: " + String(sensors.values()->temperature_bme680)
+                       + ", temp. sht: " + String(sensors.values()->temperature_sht3x)
+                       + ", humidity bme: " + String(sensors.values()->humidity_bme680)
+                       + ", humidity sht: " + String(sensors.values()->humidity_sht3x)
                        + ", pressure: " + String(sensors.values()->pressure)
                        + ", pressure SL: " + String(sensors.values()->pressureSeaLevel));
     }

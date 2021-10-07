@@ -51,10 +51,10 @@ void handlePrometheusClient() {
     char response[BUFSIZE];
     Sensors::SensorValues *values = staticSensors->values();
     snprintf(response, BUFSIZE, response_template,
-             commentOnNull(values->temperature), DEVICE_NAME, values->temperature,
+             commentOnNull(values->temperature_bme680), DEVICE_NAME, values->temperature_bme680,
              commentOnNull(values->pressure), DEVICE_NAME, values->pressure,
              commentOnNull(values->pressureSeaLevel), DEVICE_NAME, values->pressureSeaLevel,
-             commentOnNull(values->humidity), DEVICE_NAME, values->humidity,
+             commentOnNull(values->humidity_bme680), DEVICE_NAME, values->humidity_bme680,
              commentOnNull(values->aqiVoc), DEVICE_NAME, values->aqiVoc,
              commentOnNull(values->aqiCO2), DEVICE_NAME, values->aqiCO2,
              commentOnNull(values->aqiPM2_5), DEVICE_NAME, values->aqiPM2_5,
