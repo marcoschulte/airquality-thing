@@ -4,7 +4,7 @@
 
 #define CO2_EVERY_MS 5 * 1000
 
-#define PM_EVERY_MS 30 * 1000
+#define PM_EVERY_MS 300 * 1000
 #define PM_WARMUP_MS 30 * 1000
 
 #define BME_EVERY_MS 3 * 1000

@@ -1,6 +1,6 @@
 #include "WifiMgr.h"
 
-const char *apName = "AirQualityThing";
+const char *apName = "AirThing1";
 std::function<void()> WifiMgr::connectedCallback = NULL;
 
 void WifiMgr::connect(std::function<void()> _connectedCallback) {

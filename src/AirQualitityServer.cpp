@@ -2,7 +2,7 @@
 #include "AirQualitityServer.h"
 
 #define HTTP_SERVER_PORT 80
-#define DEVICE_NAME "airqualitything1"
+#define DEVICE_NAME "airthing1"
 
 ESP8266WebServer http_server = ESP8266WebServer(HTTP_SERVER_PORT);
 Sensors *staticSensors;
