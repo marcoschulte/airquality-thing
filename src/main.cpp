@@ -2,21 +2,25 @@
 #include "git_version.h"
 #include "WifiMgr.h"
 #include "Sensors.h"
+#include "NightMode.h"
 #include "Display.h"
 #include "AirQualitityServer.h"
 #include "StatusLed.h"
 
+
 WifiMgr wifiMgr;
 Sensors sensors;
-Display display(&sensors);
+NightMode nightMode;
+Display display(&sensors, &nightMode);
 AirQualitityServer server;
-StatusLed statusLed(&sensors);
+StatusLed statusLed(&sensors, &nightMode);
 
 void initWifi();
 
 void initSensors();
 
 void initDisplay();
+
 
 void setup() {
     Serial.begin(115200);
@@ -36,6 +40,8 @@ void setup() {
 void connected() {
     Serial.println("WiFi connected. Starting server");
     server.start(&sensors);
+
+    nightMode.init();
 }
 
 void initWifi() {
@@ -58,6 +64,7 @@ void loop() {
     bool updated = sensors.tick();
     display.tick();
     server.tick();
+    nightMode.tick();
 
     if (updated) {
         Serial.print("CO2 " + String(sensors.values()->co2));

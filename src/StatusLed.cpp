@@ -70,7 +70,7 @@ uint16_t toUnsignedHue(int32_t hue) {
 void StatusLed::internalTick() {
     hueSetpoint = aqiToHue(sensors->values()->aqiMax);
     satSetpoint = 255;
-    valSetpoint = 50;
+    valSetpoint = nightMode->isNight() ? 3 : 50;
 
     int32_t sHueSet = toSignedHue(hueSetpoint);
     int32_t sHueCur = toSignedHue(hueCur);
@@ -79,10 +79,9 @@ void StatusLed::internalTick() {
     int32_t nextHue = sHueCur + dif * 0.03;
 
     hueCur = toUnsignedHue(nextHue);
-    satCur += (uint16_t) ((satSetpoint - satCur) * 0.03);
-    valCur += (uint16_t) ((valSetpoint - valCur) * 0.03);
+    satCur += (satSetpoint - satCur) * 0.03;
+    valCur += (valSetpoint - valCur) * 0.03;
 
-    pixels.setPixelColor(0, pixels.ColorHSV(hueCur, satCur, valCur));
+    pixels.setPixelColor(0, pixels.ColorHSV(hueCur, (uint16_t) satCur, (uint16_t) valCur));
     pixels.show();
 }
-

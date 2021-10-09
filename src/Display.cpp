@@ -4,9 +4,25 @@
 
 void Display::init() {
     display.init();
+    display.displayOn();
+    isDisplayOn = true;
 }
 
 void Display::tick() {
+    if (nightMode->isNight()) {
+        if (isDisplayOn) {
+            display.displayOff();
+            isDisplayOn = false;
+        }
+
+        return;
+    } else {
+        if (!isDisplayOn) {
+            display.displayOn();
+            isDisplayOn = true;
+        }
+    }
+
     if (millis() - lastFrame > FRAME_SWITCH_MS) {
         if (frame == 0) {
             displayFrame1();

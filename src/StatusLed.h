@@ -4,13 +4,14 @@
 
 #include <Adafruit_NeoPixel.h>
 #include "Sensors.h"
+#include "NightMode.h"
 
 #define LED_PIN     D7
 #define NUM_LEDS    1
 
 class StatusLed {
 public:
-    StatusLed(Sensors *sensors) : sensors(sensors) {};
+    StatusLed(Sensors *sensors, NightMode *nightMode) : sensors(sensors), nightMode(nightMode) {};
 
     void init();
 
@@ -18,10 +19,12 @@ public:
 
 private:
     Sensors *sensors;
+    NightMode *nightMode;
     Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
+
     uint16_t hueSetpoint, hueCur = 100;
-    uint8_t satSetpoint, satCur = 100;
-    uint8_t valSetpoint, valCur = 100;
+    float satSetpoint, satCur = 100;
+    float valSetpoint, valCur = 100;
 
     float easeOutCirc(float x);
 
